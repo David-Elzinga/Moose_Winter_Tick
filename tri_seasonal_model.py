@@ -1,22 +1,28 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-def simulate(num_years, init_cond, parm):
+def simulate(num_years, init_cond, parm, granularity, thresh):
 
-    # Set up lists to hold the populations and time. 
+    # Set up lists to hold the populations and time. One list holds the populations for each time point (Zsol),
+    # and the other holds the total population at the beginning of each winter (Zwinter).
     Z0 = np.array(init_cond)
     Zsol = [Z0]; tsol = [0]
+    Zwinter = []
 
     # Define the ODEs.
     def winter_odes(t, Z, parm):
         # Unpack the states, preallocate ODE evaluations. 
         S, E, I, TH, TQ = Z; ODEs = 5*[0]
-
+        
         # Calculate ODEs
-        dS = -(parm['mu'] + parm['mu_omega'])*S
+        dS = -(parm['mu'] + parm['mu_omega'])*S 
         dE = -(parm['eta'] + parm['mu_omega'])*E
-        dI = -(parm['eta'] + parm['mu_omega'])*(1-parm['c'])*I - (parm['mu'] + parm['mu_omega'])*parm['c']*I - I*parm['nu']*(TH/I)/(parm['a']*parm['c'] + parm['b']*(1-parm['c']) + (TH/I))
-        dTH =  dI * TH/I
+        if I < 10**(-10):
+            dI = 0
+            dTH = 0
+        else:
+            dI = -(parm['eta'] + parm['mu_omega'])*(1-parm['c'])*I - (parm['mu'] + parm['mu_omega'])*parm['c']*I - I*parm['nu']*parm['z']/(parm['a']*parm['c'] + parm['b']*(1-parm['c']) + parm['z'])
+            dTH =  parm['z'] * parm['q'] * dI
         dTQ = 0
         return [dS, dE, dI, dTH, dTQ]
 
@@ -48,12 +54,16 @@ def simulate(num_years, init_cond, parm):
     # Simulate the years. 
     for year in range(num_years):
 
-        # Simulate winter. First calculate c
+        parm['n'] = year
+        Zwinter.append(sum(Zsol[-1][:3])) 
+
+        # Simulate winter. First calculate c and z
         parm['c'] = Zsol[-1][0] / (Zsol[-1][0] + Zsol[-1][1])
+        parm['z'] = Zsol[-1][3] / Zsol[-1][2]
         t_winter = [year, year + parm['omega']]
-        X = solve_ivp(fun=winter_odes, t_span=t_winter, t_eval=np.linspace(t_winter[0], t_winter[1], 100), y0=Zsol[-1], args=(parm,))
+        X = solve_ivp(fun=winter_odes, t_span=t_winter, t_eval=np.linspace(t_winter[0], t_winter[1], granularity), y0=Zsol[-1], args=(parm,))
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
-        if sum(X.y.T[-1][:3]) < 1: # if the moose population is extinct, stop.
+        if sum(X.y.T[-1][:3]) < thresh: # if the moose population is extinct, stop.
             break
 
         # Pulse into summer.
@@ -70,9 +80,9 @@ def simulate(num_years, init_cond, parm):
         else: # if we divide by zero, there's no ticks anymore -> make d = 0 and l = 1 so that gamma -> gamma max.
             parm['d'] = 0; parm['l'] = 1
         t_summer = [year + parm['omega'], year + parm['omega'] + parm['tau']]
-        X = solve_ivp(fun=summer_odes, t_span=t_summer, t_eval=np.linspace(t_summer[0], t_summer[1], 100), y0=Zsol[-1], args=(parm,))
+        X = solve_ivp(fun=summer_odes, t_span=t_summer, t_eval=np.linspace(t_summer[0], t_summer[1], granularity), y0=Zsol[-1], args=(parm,))
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
-        if sum(X.y.T[-1][:3]) < 1:
+        if sum(X.y.T[-1][:3]) < thresh:
             break
 
         # Pulse into autumn
@@ -85,9 +95,9 @@ def simulate(num_years, init_cond, parm):
 
         # Simulate autumn
         t_autumn = [year + parm['omega'] + parm['tau'], year + 1]
-        X = solve_ivp(fun=autumn_odes, t_span=t_autumn, t_eval=np.linspace(t_autumn[0], t_autumn[1], 100), y0=Zsol[-1], args=(parm,))
+        X = solve_ivp(fun=autumn_odes, t_span=t_autumn, t_eval=np.linspace(t_autumn[0], t_autumn[1], granularity), y0=Zsol[-1], args=(parm,))
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
-        if sum(X.y.T[-1][:3]) < 1:
+        if sum(X.y.T[-1][:3]) < thresh:
             break
 
         # Pulse into winter. 
@@ -99,4 +109,4 @@ def simulate(num_years, init_cond, parm):
         new_TQ = 0
         Zsol = np.vstack((Zsol, np.array([new_S, new_E, new_I, new_TH, new_TQ])))
 
-    return tsol, Zsol
+    return tsol, Zsol, Zwinter
