@@ -17,12 +17,8 @@ def simulate(num_years, init_cond, parm, granularity, thresh):
         # Calculate ODEs
         dS = -(parm['mu'] + parm['mu_omega'])*S 
         dE = -(parm['eta'] + parm['mu_omega'])*E
-        if I < 10**(-10):
-            dI = 0
-            dTH = 0
-        else:
-            dI = -(parm['eta'] + parm['mu_omega'])*(1-parm['c'])*I - (parm['mu'] + parm['mu_omega'])*parm['c']*I - I*parm['nu']*parm['z']/(parm['a']*parm['c'] + parm['b']*(1-parm['c']) + parm['z'])
-            dTH =  parm['z'] * parm['q'] * dI
+        dI = -(parm['eta'] + parm['mu_omega'])*(1-parm['c'])*I - (parm['mu'] + parm['mu_omega'])*parm['c']*I - parm['nu']*parm['z_I']*I
+        dTH =  parm['z_I'] * parm['q'] * dI + (1-parm['q'])/2 * (parm['z_S'] * dS + parm['z_E'] * dE)
         dTQ = 0
         return [dS, dE, dI, dTH, dTQ]
 
@@ -59,7 +55,7 @@ def simulate(num_years, init_cond, parm, granularity, thresh):
 
         # Simulate winter. First calculate c and z
         parm['c'] = Zsol[-1][0] / (Zsol[-1][0] + Zsol[-1][1])
-        parm['z'] = Zsol[-1][3] / Zsol[-1][2]
+        parm['z_I'] = Zsol[-1][3] / Zsol[-1][2]; parm['z_E'] = Zsol[-1][3] / Zsol[-1][1]; parm['z_S'] = Zsol[-1][3] / Zsol[-1][0]
         t_winter = [year, year + parm['omega']]
         X = solve_ivp(fun=winter_odes, t_span=t_winter, t_eval=np.linspace(t_winter[0], t_winter[1], granularity), y0=Zsol[-1], args=(parm,))
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
