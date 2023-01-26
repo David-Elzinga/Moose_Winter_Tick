@@ -8,7 +8,7 @@ def annual_map(num_years, init_cond, parm, thresh):
 
     # Use discrete map to go one year at a time. 
     for year in range(num_years):
-        S_new = ((1 + parm['r_P'])*np.exp(parm['gamma']*parm['tau']) - parm['u']*parm['r_P'] - 1)*P*np.exp(-parm['alpha']*parm['beta'] - parm['gamma']*parm['tau'] - parm['nu']*parm['omega'] - parm['mu']) + (1 + parm['r_S'])*S*np.exp(-parm['alpha']*parm['beta'] - parm['mu'])
+        S_new = (1 + parm['r_S'])*S*np.exp(-parm['alpha']*parm['beta'] - parm['mu']) + ((1 + parm['r_P'])*np.exp(parm['gamma']*parm['tau']) - parm['u']*parm['r_P'] - 1)*P*np.exp(-parm['alpha']*parm['beta'] - parm['gamma']*parm['tau'] - parm['nu']*parm['omega'] - parm['mu']) 
         P_new = ((np.exp(parm['alpha']*parm['beta']) - 1)*np.exp(parm['gamma']*parm['tau']) + parm['r_P']*((np.exp(parm['alpha']*parm['beta']) - 1)*np.exp(parm['gamma']*parm['tau']) + parm['u']) + 1)*P*np.exp(-parm['alpha']*parm['beta'] - parm['gamma']*parm['tau'] - parm['nu']*parm['omega'] - parm['mu']) + (np.exp(parm['alpha']*parm['beta']) - 1)*(1 + parm['r_S'])*S*np.exp(-parm['alpha']*parm['beta'] - parm['mu'])
         Zsol.append(S_new+P_new)
         S = S_new; P = P_new
