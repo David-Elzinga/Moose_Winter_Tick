@@ -5,16 +5,20 @@ import matplotlib.pyplot as plt
 # Things to do: add rannge in plotting to be minimum of number of years specified and number of years ran before thresh extn
 
 # Specify the initial conditions. Group them into an array 'Z0'. 
-S0 = 500; P0 = 10; Z0 = [S0, P0]
+S0 = 100; P0 = 500; Z0 = [S0, P0]
 
 # Define model parameters. 
 parm = {}
-parm['omega'] = 0.25; parm['alpha'] = 0.3; parm['tau'] = 1 - parm['alpha'] - parm['omega']
-parm['mu'] = 0.293; parm['nu'] = 3;  parm['gamma'] = 0.755; parm['beta'] = 10**(1)
-parm['r_S'] = 0.8572; parm['r_P'] = 0.8572; parm['u'] = 1
+parm['omega'] = 0.25; parm['alpha'] = 0.6; parm['tau'] = 1 - parm['alpha'] - parm['omega']
+parm['mu'] = 0.293; parm['nu'] = 3;  parm['gamma'] = 0.755; parm['beta'] = 10**(0.5)
+parm['r_S'] = 1.8572; parm['r_P'] = 1.7572; parm['u'] = 1
+
+#(1 - np.exp(parm['mu']) + np.exp(parm['mu'] + parm['gamma']*parm['tau'])*(1 + parm['r_P'] - np.exp(parm['alpha']*parm['beta']) - np.exp(parm['nu']*parm['omega']) + np.exp(parm['alpha']*parm['beta'] + parm['nu']*parm['omega'] + parm['mu']) - parm['r_P']*np.exp(parm['alpha']*parm['beta'])) + parm['u']*parm['r_P']*(1-np.exp(parm['mu']))) / (np.exp(parm['gamma']*parm['tau'] + parm['nu']*parm['omega'] + parm['mu']) - parm['u']*parm['r_P'] - 1)
+
+print((1/parm['beta']) * (np.log(1 + parm['r_S'] - ((parm['r_P'] + 1 - np.exp(-parm['gamma']*parm['tau'])*(1 + parm['u']*parm['r_P']))*(np.exp(parm['mu']) - parm['r_S'] - 1))/(np.exp(parm['mu'] + parm['nu']*parm['omega']) - parm['r_P'] - 1)) - parm['mu']))
 
 # Run the model numerically
-num_years = 10
+num_years = 30
 tsol, Zsol, Zwinter_ODEs = acm.simulate(num_years, init_cond=Z0, parm=parm, granularity=10, thresh = 10)
 
 # Get the exact solution
