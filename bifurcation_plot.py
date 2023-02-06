@@ -56,6 +56,7 @@ fig, ax = plt.subplots(1,1)
 
 ax.plot(rP_range_plot[cond_3_alpha < 1], cond_3_alpha[cond_3_alpha < 1], 'r--', linewidth=2.5)
 ax.fill_between(x=rP_range_plot[cond_3_alpha < 1], y1=cond_3_alpha[cond_3_alpha < 1], y2 = 1, color='red', alpha=0.5)
+ax.plot(0.4, 0.0833, color='purple', marker='.', markersize=20)
 
 ax.hlines(y = 1, xmin = 0, xmax = 1000, linestyle='-', color='k')
 ax.vlines(x = rP_max, ymin = 0, ymax = 1, linestyle='--', color='k')
