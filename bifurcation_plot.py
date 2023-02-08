@@ -9,8 +9,8 @@ def cond_3_alpha(p):
 # Define parameter values
 p = {}
 p['omega'] = 0.5425; p['alpha'] = 0.0833; p['tau'] = 1 - p['alpha'] - p['omega']
-p['mu'] = 0.2930; p['nu'] = 2.3774;  p['gamma'] = 1; p['beta'] = 10**(0.5)
-p['r_S'] = 0.8; p['r_P'] = 0.4; p['u'] = 0.8
+p['mu'] = 0.2835; p['nu'] = 2.3772;  p['gamma'] = 1.8523; p['beta'] = 2.5595
+p['r_S'] = 0.8590; p['r_P'] = 0.4998; p['u'] = 0.75
 
 # Define parameter groupings
 p['T'] = p['tau']*p['gamma'];
@@ -54,9 +54,9 @@ cond_3_alpha = np.array([cond_3_alpha(p) for p['r_P'] in rP_range_plot])
 
 fig, ax = plt.subplots(1,1)
 
-ax.plot(rP_range_plot[cond_3_alpha < 1], cond_3_alpha[cond_3_alpha < 1], 'r--', linewidth=2.5)
-ax.fill_between(x=rP_range_plot[cond_3_alpha < 1], y1=cond_3_alpha[cond_3_alpha < 1], y2 = 1, color='red', alpha=0.5)
-ax.plot(0.4, 0.0833, color='purple', marker='.', markersize=20)
+ax.plot(rP_range_plot[cond_3_alpha < 1], cond_3_alpha[cond_3_alpha < 1], color='purple', linestyle='--', linewidth=2.5)
+ax.fill_between(x=rP_range_plot[cond_3_alpha < 1], y1=cond_3_alpha[cond_3_alpha < 1], y2 = 1, color='purple', alpha=0.5)
+ax.plot(0.4, 0.0833, color='red', marker='.', markersize=20)
 
 ax.hlines(y = 1, xmin = 0, xmax = 1000, linestyle='-', color='k')
 ax.vlines(x = rP_max, ymin = 0, ymax = 1, linestyle='--', color='k')
