@@ -1,27 +1,11 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-def annual_map(num_years, init_cond, parm, thresh):
-    # Unpack the states
-    S, P = init_cond
-    Zsol = [S + P]
-
-    # Use discrete map to go one year at a time. 
-    for year in range(num_years):
-        S_new = (1 + parm['r_S'])*S*np.exp(-parm['alpha']*parm['beta'] - parm['mu']) + ((1 + parm['r_P'])*np.exp(parm['gamma']*parm['tau']) - parm['u']*parm['r_P'] - 1)*P*np.exp(-parm['alpha']*parm['beta'] - parm['gamma']*parm['tau'] - parm['nu']*parm['omega'] - parm['mu']) 
-        P_new = ((np.exp(parm['alpha']*parm['beta']) - 1)*np.exp(parm['gamma']*parm['tau']) + parm['r_P']*((np.exp(parm['alpha']*parm['beta']) - 1)*np.exp(parm['gamma']*parm['tau']) + parm['u']) + 1)*P*np.exp(-parm['alpha']*parm['beta'] - parm['gamma']*parm['tau'] - parm['nu']*parm['omega'] - parm['mu']) + (np.exp(parm['alpha']*parm['beta']) - 1)*(1 + parm['r_S'])*S*np.exp(-parm['alpha']*parm['beta'] - parm['mu'])
-        Zsol.append(S_new+P_new)
-        S = S_new; P = P_new
-        if S + P < thresh:
-            break
-    
-    return Zsol
-
 def simulate(num_years, init_cond, parm, granularity, thresh):
 
     # Set up lists to hold the populations and time. One list holds the populations for each time point (Zsol),
     # and the other holds the total population at the beginning of each winter (Zwinter). The population lists 
-    # are ordered as S, P. 
+    # are ordered as S, E, P, H, Q. 
     Z0 = np.array(init_cond)
     Zsol = [Z0]; tsol = [0]
     Zwinter = []
@@ -29,62 +13,82 @@ def simulate(num_years, init_cond, parm, granularity, thresh):
     # Define the ODEs.
     def winter_odes(t, Z, parm):
         # Unpack the states, preallocate ODE evaluations. 
-        S, P = Z; ODEs = 2*[0]
+        S, E, P, H, Q = Z; ODEs = 5*[0]
         
         # Calculate ODEs
-        dS = -parm['mu']*S 
-        dP = -(parm['mu'] + parm['nu'])*P
-        return [dS, dP]
+        dS = -(p['mu'] + p['mu_omega'])*S 
+        dE = -(p['mu'] + p['mu_omega'] + p['mu_eta'])*E
+        dP = -(p['mu'] + p['eta'])*(1 - p['b'])*P - p['mu']*p['b']*P - p['nu']*(p['H+/P+']/p['xi'])*P - p['mu_omega']*P
+        dH = p['q']*p['H+/P+']*dP + ((1 - p['q'])/2 * (p['H+/S+']*dS + p['H+/E+']*dE))
+        dQ = 0                      
+        return [dS, dE, dP, dH, dQ]
 
     def summer_odes(t, Z, parm):
         # Unpack the states
-        S, P = Z; ODEs = 2*[0]
+        S, E, P, H, Q = Z; ODEs = 5*[0]
 
         # Calculate ODEs
-        dS = parm['gamma']*P - parm['mu']*S
-        dP = -(parm['gamma'] + parm['mu'])*P
-        return [dS, dP]
+        dS = p['gamma']*p['P-/H-']*E / (p['c'] + p['P-/H-']) - p['mu']*S
+        dE = -p['gamma']*p['P-/H-']*E / (p['c'] + p['P-/H-']) - p['mu']*E
+        dP = 0
+        dH = 0
+        dQ = 0
+        return [dS, dE, dP, dH, dQ]
     
     def autumn_odes(t, Z, parm):
         # Unpack the states
-        S, P = Z; ODEs = 2*[0]
+        S, E, P, H, Q = Z; ODEs = 5*[0]
+        N = S + E + P
 
         # Calculate ODEs
-        dS = -(parm['beta'] + parm['mu'])*S
-        dP = parm['beta']*S - parm['mu']*P
-        return [dS, dP]
+        dS = -p['beta_M']*S*Q - (p['mu'] + p['mu_alpha'])*S
+        dE = -p['beta_M']*E*Q - (p['mu'] + p['mu_alpha'])*E
+        dP = p['beta_M']*(S + E)*Q - (p['mu'] + p['mu_alpha'])*P
+        dH = p['beta_T']*N*Q
+        dQ = -p['beta_T']*N*Q
+        return [dS, dE, dP, dH, dQ]
     
     # Simulate the years. 
     for year in range(num_years + 1):
 
         parm['n'] = year
-        Zwinter.append(sum(Zsol[-1][:2])) 
+        Zwinter.append(sum(Zsol[-1][:3])) 
 
         # Simulate winter
+        S, E, P, H, Q = Zsol[-1]
+        p['H+/P+'] = H/P; p['H+/S+'] = H/S; p['H+/E+'] = H/E
+        p['b'] = S/(S+E)
         t_winter = [year, year + parm['omega']]
         X = solve_ivp(fun=winter_odes, t_span=t_winter, t_eval=np.linspace(t_winter[0], t_winter[1], granularity), y0=Zsol[-1], args=(parm,), atol=1e-100, rtol=1e-100)
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
-        if sum(X.y.T[-1][:2]) < thresh: # if the moose population is extinct, stop.
+        if sum(X.y.T[-1][:3]) < thresh: # if the moose population is extinct, stop.
             break
 
         # Pulse into summer.
-        tsol.append(tsol[-1]); S, P = Zsol[-1]
-        new_S = (1 + parm['r_S'])*S + (1 - parm['u'])*parm['r_P']*P 
-        new_P = (1 + parm['u']*parm['r_P'])*P
-        Zsol = np.vstack((Zsol, np.array([new_S, new_P])))
+        tsol.append(tsol[-1]); S, E, P, H, Q = Zsol[-1]
+        N = S + E + P
+        new_S = S*(1+p['r_S']) - p['r_S']*N**2/p['K'] + (E + P)*(1 + p['u']*p['r_P']) - p['r_P']*N**2/p['K']
+        new_E = E + P
+        new_P = 0
+        new_H = 0
+        new_Q = 0
+        Zsol = np.vstack((Zsol, np.array([new_S, new_E, new_P, new_H, new_Q])))
 
         # Simulate summer. 
         t_summer = [year + parm['omega'], year + parm['omega'] + parm['tau']]
         X = solve_ivp(fun=summer_odes, t_span=t_summer, t_eval=np.linspace(t_summer[0], t_summer[1], granularity), y0=Zsol[-1], args=(parm,), atol=1e-100, rtol=1e-100)
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
-        if sum(X.y.T[-1][:2]) < thresh:
+        if sum(X.y.T[-1][:3]) < thresh:
             break
 
         # Pulse into autumn
-        tsol.append(tsol[-1]); S, P = Zsol[-1]
+        tsol.append(tsol[-1]); S, E, P, H, Q = Zsol[-1]
         new_S = S
+        new_E = E
         new_P = P
-        Zsol = np.vstack((Zsol, np.array([new_S, new_P])))
+        new_H = H
+        new_Q = p['r_T']*Q
+        Zsol = np.vstack((Zsol, np.array([new_S, new_E, new_P, new_H, new_Q])))
 
         # Simulate autumn
         t_autumn = [year + parm['omega'] + parm['tau'], year + 1]
@@ -94,9 +98,12 @@ def simulate(num_years, init_cond, parm, granularity, thresh):
             break
 
         # Pulse into winter. 
-        tsol.append(tsol[-1]); S, P = Zsol[-1]
+        tsol.append(tsol[-1]); S, E, P, H, Q = Zsol[-1]
         new_S = S
+        new_E = E
         new_P = P
-        Zsol = np.vstack((Zsol, np.array([new_S, new_P])))
+        new_H = H
+        new_Q = 0
+        Zsol = np.vstack((Zsol, np.array([new_S, new_E, new_P, new_H, new_Q])))
 
     return tsol, Zsol, Zwinter
