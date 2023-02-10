@@ -61,7 +61,7 @@ def simulate(num_years, init_cond, p, granularity, thresh):
         p['H+/P+'] = H/P; p['H+/S+'] = H/S; p['H+/E+'] = H/E
         p['b'] = S/(S+E)
         t_winter = [year, year + p['omega']]
-        X = solve_ivp(fun=winter_odes, t_span=t_winter, t_eval=np.linspace(t_winter[0], t_winter[1], granularity), y0=Zsol[-1], args=(p,), atol=1e-100, rtol=1e-100)
+        X = solve_ivp(fun=winter_odes, t_span=t_winter, t_eval=np.linspace(t_winter[0], t_winter[1], granularity), y0=Zsol[-1], args=(p,), atol=1e-10, rtol=1e-10)
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
         if sum(X.y.T[-1][:3]) < thresh: # if the moose population is extinct, stop.
             break
@@ -80,7 +80,7 @@ def simulate(num_years, init_cond, p, granularity, thresh):
         S, E, P, H, Q = Zsol[-1]
         p['P-/H-'] = P/Q # Q = H-
         t_summer = [year + p['omega'], year + p['omega'] + p['tau']]
-        X = solve_ivp(fun=summer_odes, t_span=t_summer, t_eval=np.linspace(t_summer[0], t_summer[1], granularity), y0=Zsol[-1], args=(p,), atol=1e-100, rtol=1e-100)
+        X = solve_ivp(fun=summer_odes, t_span=t_summer, t_eval=np.linspace(t_summer[0], t_summer[1], granularity), y0=Zsol[-1], args=(p,), atol=1e-10, rtol=1e-10)
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
         if sum(X.y.T[-1][:3]) < thresh:
             break
@@ -96,7 +96,7 @@ def simulate(num_years, init_cond, p, granularity, thresh):
 
         # Simulate autumn
         t_autumn = [year + p['omega'] + p['tau'], year + 1]
-        X = solve_ivp(fun=autumn_odes, t_span=t_autumn, t_eval=np.linspace(t_autumn[0], t_autumn[1], granularity), y0=Zsol[-1], args=(p,), atol=1e-100, rtol=1e-100)
+        X = solve_ivp(fun=autumn_odes, t_span=t_autumn, t_eval=np.linspace(t_autumn[0], t_autumn[1], granularity), y0=Zsol[-1], args=(p,), atol=1e-10, rtol=1e-10)
         Zsol = np.vstack((Zsol, X.y.T)); tsol = tsol + X.t.tolist()
         if sum(X.y.T[-1][:3]) < thresh:
             break

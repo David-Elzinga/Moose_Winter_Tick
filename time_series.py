@@ -25,7 +25,7 @@ if model_type == 'acm':
     S0 = 1500; P0 = 500; Z0 = [S0, P0]
 
     # Run the model numerically
-    tsol, Zsol, Zwinter_ODEs = acm.simulate(num_years, init_cond=Z0, parm=parm, granularity=10, thresh = 10)
+    tsol, Zsol, Zwinter_ODEs = acm.simulate(num_years, init_cond=Z0, parm=parm, granularity=2, thresh = 10)
 
     # Get the exact solution
     Zwinter_exact = acm.annual_map(num_years, init_cond=Z0, parm=parm, thresh=10)

@@ -9,7 +9,7 @@ import numpy as np
 from wildlife_management_model import simulate
 import time
 
-# N - 100,000
+# N = 2**14
 
 default_n = os.cpu_count()
 parser = argparse.ArgumentParser()
@@ -40,26 +40,21 @@ def run_model(p):
 
     # Run the model
     num_years = 200
-    S0 = 800; E0 = 50; P0 = 120; H0 = 10**4; Q0 = 0
-    t0 = time.time()
-    tsol, Zsol, Zwinter = simulate(num_years, init_cond=[S0, E0, P0, H0, Q0], p=parm, granularity=3, thresh=10)
-    t1 = time.time()
-    print(t1-t0)
+    S0 = 1000; E0 = 250; P0 = 250; H0 = 52000*250; Q0 = 0
+    tsol, Zsol, Zwinter = simulate(num_years, init_cond=[S0, E0, P0, H0, Q0], p=parm, granularity=2, thresh=10)
 
-    if t1 - t0 > 50:
-        print(parm)
     if len(Zwinter) < num_years: # In this case there was an extinction, so deviation we assume is zero.
         std = 0
     else: # Not an extinction, record the standard deviation over the final 100 years.
         std = np.std(Zwinter[-100:])
-    return std
+    return std, Zwinter[-1]
 
 def main(N, ncores=None, pool=None):
 
     # Define the parameter space within the context of a problem dictionary
     problem = {
         # number of parameters
-        'num_vars' : 15,
+        'num_vars' : 16,
         # parameter names
         'names' : ['omega', 'alpha', 'mu', 'nu', 'gamma', 'beta', 'r_S', 'r_P', 'u', 'eta', 'xi', 'q', 'K', 'r_T', 'c', 'dummy'], 
         # bounds for each corresponding parameter
@@ -78,7 +73,8 @@ def main(N, ncores=None, pool=None):
         [0, 1], # q
         [1200, 1800], # K
         [3.2588, 35.5531], # r_T
-        [-4, 0] # c (log-scale)
+        [-4, 0], # c (log-scale)
+        [-1, 1] # dummy
         ]
     }
 
@@ -89,12 +85,11 @@ def main(N, ncores=None, pool=None):
     t0 = time.time()
     output = pool.map(worker, param_values)
     t1 = time.time()
-
     print(t1-t0)
 
     # Save our results as a dictionary before we processes them.  
     with open("unprocessed_sobol.pickle", "wb") as f:
-        result = {'output': output, 'param_values': param_values}
+        result = {'output_std': [k[0] for k in output], 'output_pop_size': [k[1] for k in output], 'param_values': param_values}
         pickle.dump(result, f)
 
 def analyze_sobol():
@@ -102,7 +97,7 @@ def analyze_sobol():
     # Define the parameter space within the context of a problem dictionary
     problem = {
         # number of parameters
-        'num_vars' : 15,
+        'num_vars' : 16,
         # parameter names
         'names' : ['omega', 'alpha', 'mu', 'nu', 'gamma', 'beta', 'r_S', 'r_P', 'u', 'eta', 'xi', 'q', 'K', 'r_T', 'c', 'dummy'], 
         # bounds for each corresponding parameter
@@ -121,14 +116,15 @@ def analyze_sobol():
         [0, 1], # q
         [1200, 1800], # K
         [3.2588, 35.5531], # r_T
-        [-4, 0] # c (log-scale)
+        [-4, 0], # c (log-scale)
+        [-1, 1] # dummy
         ]
     }
 
     with open('unprocessed_sobol.pickle', 'rb') as handle:
         result = pickle.load(handle)
     
-    output = np.array(result['output'])
+    output = np.array(result['output_std'])
     S2 = {}
     var_sens = sobol.analyze(problem, output, calc_second_order=True)
     S2['var'] = pd.DataFrame(var_sens.pop('S2'), index=problem['names'],
