@@ -9,6 +9,8 @@ import numpy as np
 from wildlife_management_model import simulate
 import time
 
+import matplotlib.pyplot as plt
+
 # N = 2**14
 
 default_n = os.cpu_count()
@@ -21,8 +23,8 @@ parser.add_argument("-m", "--mode", type=str, default = 'generate',
                     help="generate or analyze sobol samples")
 
 def worker(param_values):
-    std = run_model(param_values)
-    return std
+    output = run_model(param_values)
+    return output
 
 def run_model(p):
 
@@ -136,9 +138,36 @@ def analyze_sobol():
                            columns=problem['names'])
     S2['var_conf'] = pd.DataFrame(var_sens.pop('S2_conf'), index=problem['names'],
                            columns=problem['names'])
+    var_sens_std = pd.DataFrame(var_sens,index=problem['names'])
+    var_sens_std = var_sens_std[var_sens_std['ST'] > 0]
 
-    var_sens = pd.DataFrame(var_sens,index=problem['names'])
-    import pdb; pdb.set_trace()
+    output = np.array(result['output_pop_size'])
+    S2 = {}
+    var_sens = sobol.analyze(problem, output, calc_second_order=True)
+    S2['var'] = pd.DataFrame(var_sens.pop('S2'), index=problem['names'],
+                           columns=problem['names'])
+    S2['var_conf'] = pd.DataFrame(var_sens.pop('S2_conf'), index=problem['names'],
+                           columns=problem['names'])
+    var_sens_pop_size = pd.DataFrame(var_sens,index=problem['names'])
+    var_sens_pop_size = var_sens_pop_size[var_sens_pop_size['ST'] > 0]
+
+
+    ind = np.arange(len(var_sens_std.index))  # the x locations for the groups
+    width = 0.35  # the width of the bars
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(ind - width/2, var_sens_std['ST'], width, yerr=var_sens_std['ST_conf'],
+                    label='Pop. SD.')
+    rects2 = ax.bar(ind + width/2, var_sens_pop_size['ST'], width, yerr=var_sens_pop_size['ST_conf'],
+                    label='Pop. Size')
+    
+    ax.set_ylabel('Total Sobol Index', fontsize=15)
+    ax.set_xticks(ind)
+    ax.set_xticklabels((r'$\omega$', r'$\alpha$', r'$\mu$', r'$\nu$', r'$\beta$', r'$r_S$', r'$r_P$', r'$u$', r'$\eta$', r'$\xi$', r'$q$', r'$K$', r'$r_T$'))
+    ax.legend(fontsize=12)
+    ax.set_ylim(0, 1)
+
+    plt.savefig('sobol.pdf')
 
 if __name__ == "__main__":
     args = parser.parse_args()
