@@ -32,7 +32,7 @@ def run_model(p):
 
     # These parameters vary. 
     parm['omega'] = p[0]; parm['alpha'] = p[1]; parm['tau'] = 1 - parm['alpha'] - parm['omega']
-    parm['mu'] = p[2]; parm['nu'] = p[3];  parm['gamma'] = p[4]; parm['beta'] = 10**(-p[5])
+    parm['mu'] = p[2]; parm['nu'] = p[3];  parm['gamma'] = p[4]; parm['beta'] = 10**(p[5])
     parm['r_S'] = p[6]; parm['r_P'] = p[7]; parm['u'] = p[8]
 
     parm['eta'] = p[9]; parm['xi'] = p[10]; parm['q'] = p[11]; parm['K'] = p[12]; parm['r_T'] = p[13]
@@ -41,7 +41,12 @@ def run_model(p):
     # Run the model
     num_years = 200
     S0 = 1000; E0 = 250; P0 = 250; H0 = 52000*250; Q0 = 0
+    t0 = time.time()
     tsol, Zsol, Zwinter = simulate(num_years, init_cond=[S0, E0, P0, H0, Q0], p=parm, granularity=2, thresh=10)
+    t1 = time.time()
+
+    if t1 - t0 > 30:
+        print(parm)
 
     if len(Zwinter) < num_years: # In this case there was an extinction, so deviation we assume is zero.
         std = 0

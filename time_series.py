@@ -2,6 +2,7 @@ import numpy as np
 import analytical_climate_model as acm
 import wildlife_management_model as wmm
 import matplotlib.pyplot as plt
+import time
 
 model_type = 'wmm'
 
@@ -15,7 +16,7 @@ parm['eta'] = 1.1886; parm['xi'] = 52000; parm['q'] = 0.9; parm['K'] = 1500; par
 parm['c'] = 10**(-2); parm['beta_T'] = parm['beta']/1; parm['beta_M'] = parm['beta']/parm['xi']
 parm['mu_alpha'] = 0; parm['mu_omega'] = 0
 
-parm = {'mu_alpha': 0, 'mu_omega': 0, 'omega': 0.55020625, 'alpha': 0.12183125, 'tau': 0.32796249999999993, 'mu': 0.3425, 'nu': 2.173784375, 'gamma': 2.06070625, 'beta': 22.0673406908459, 'r_S': 0.6979375, 'r_P': 0.46855, 'u': 0.9765625, 'eta': 1.26288125, 'xi': 51900.0, 'q': 0.90625, 'K': 1293.75, 'r_T': 8.304784375, 'c': 4.216965034285822, 'beta_T': 22.0673406908459, 'beta_M': 0.00042518960868681885, 'n': 10, 'H+/P+': 191957.01117805197, 'H+/S+': 7545672.348627549, 'H+/E+': 24240138.874836802, 'b': 0.7626087849204454, 'P-/H-': 0.0}
+parm = {'mu_alpha': 0, 'mu_omega': 0, 'omega': 0.520665625, 'alpha': 0.048621875, 'tau': 0.43071249999999994, 'mu': 0.26825, 'nu': 2.9766515625, 'gamma': 2.0028156249999998, 'beta': 89.76871324473142, 'r_S': 0.9395312499999999, 'r_P': 0.471675, 'u': 0.28515625, 'eta': 1.121746875, 'xi': 58650.0, 'q': 0.890625, 'K': 1509.375, 'r_T': 4.7725953125, 'c': 2053.525026457146, 'beta_T': 89.76871324473142, 'beta_M': 0.001530583346031226, 'n': 200, 'H+/P+': 65107.43399583003, 'H+/S+': 13834.432872996773, 'H+/E+': 334904.52900515794, 'b': 0.9603301197018808, 'P-/H-': 0.0}
 #print((1/parm['beta']) * (np.log(1 + parm['r_S'] - ((parm['r_P'] + 1 - np.exp(-parm['gamma']*parm['tau'])*(1 + parm['u']*parm['r_P']))*(np.exp(parm['mu']) - parm['r_S'] - 1))/(np.exp(parm['mu'] + parm['nu']*parm['omega']) - parm['r_P'] - 1)) - parm['mu']))
 
 num_years = 200
@@ -53,12 +54,14 @@ if model_type == 'acm':
 else:
     
     # Specify the initial conditions. Group them into an array 'Z0'. 
-    S0 = 500; E0 = 10; P0 = 1; H0 = 1000; Q0 = 0; Z0 = [S0, E0, P0, H0, Q0]
+    S0 = 1000; E0 = 250; P0 = 250; H0 = 52000*250; Q0 = 0; Z0 = [S0, E0, P0, H0, Q0]
 
     # Run the model numerically
-    tsol, Zsol, Zwinter_ODEs = wmm.simulate(num_years, init_cond=Z0, p=parm, granularity=10, thresh = 10)
+    t0 = time.time()
+    tsol, Zsol, Zwinter_ODEs = wmm.simulate(num_years, init_cond=Z0, p=parm, granularity=2, thresh=10)
+    t1 = time.time()
+    print(t1- t0)
 
-    import pdb; pdb.set_trace()
     # Plot the time series (including within year variation)
     fig, axes = plt.subplots(1, 2, figsize=(5, 10), sharex=True)
 
