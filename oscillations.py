@@ -75,7 +75,7 @@ def worker(param_values):
 def main(pool, s):
 
     # Define the number of samples we want for each parameter within its range. 
-    logbeta_vals =  np.linspace(-2, 1, s)
+    logbeta_vals =  np.linspace(-3, 1, s)
     r_T_vals = np.linspace(3.2588, 35.5531, s)
     q_vals = np.array([0.75, 0.9])
 
