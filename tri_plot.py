@@ -21,12 +21,12 @@ def cond_3(p):
 # Define parameter values
 p = {}
 p['omega'] = 0.5425; p['alpha'] = 0.0833; p['tau'] = 1 - p['alpha'] - p['omega']
-p['mu'] = 0.2930; p['nu'] = 2.3774;  p['gamma'] = 1; p['beta'] = 10**(0.1)
-p['r_S'] = 0.8; p['r_P'] = 0.4; p['u'] = 0.8
+p['mu'] = 0.2835; p['nu'] = 2.3772;  p['gamma'] = 1.8523; p['beta'] = 2.5595
+p['r_S'] = 0.8590; p['r_P'] = 0.4998; p['u'] = 0.75
 
 fig = plt.figure(figsize=(14.8, 4.8))
 
-for k, p['beta'] in enumerate([1.1, 2, 3.5]):
+for k, p['beta'] in enumerate([0.8*2.5595, 2.5595, 1.2*2.5595]):
     alphas = []; omegas = []; taus = [];
     cond_1s = []; cond_3s = [];
     for p['alpha'] in np.linspace(0, 1, 100, endpoint=False):
@@ -53,7 +53,7 @@ for k, p['beta'] in enumerate([1.1, 2, 3.5]):
     cs = ax.tripcolor(
         alphas, omegas, taus, cond_3s, shading='flat', alpha = 0.5, vmin=vmin, vmax=vmax, rasterized=True, cmap=cond_3_cmap, linewidth=0.0, antialiased=True, edgecolors='face')
     
-    ax.scatter(0.0833, 0.5425, 0.3742, color='red')
+    ax.scatter(0.0833, 0.5425, 0.3742, color='orange', marker='o', s=60)
 
     ax.set_tlabel(r'$\alpha$', fontsize=15)
     ax.set_llabel(r'$\omega$', fontsize=15)
@@ -63,7 +63,7 @@ for k, p['beta'] in enumerate([1.1, 2, 3.5]):
     ax.laxis.set_label_rotation_mode('horizontal')
     ax.raxis.set_label_rotation_mode('horizontal')
 
-    ax.set_title(r'$\beta = $' + str(p['beta']), y=0, pad=-35, verticalalignment="top", fontsize=15)
+    ax.set_title(r'$\beta = $' + str(round(p['beta'], 4)), y=0, pad=-35, verticalalignment="top", fontsize=15)
 
 plt.subplots_adjust(wspace=0.6)
 
