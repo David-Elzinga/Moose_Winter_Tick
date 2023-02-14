@@ -107,12 +107,13 @@ def plot():
         sub_df = df[df['q_vals'] == q_val]
         CS = ax.contourf(sub_df['logbeta'].values.reshape(s,s), sub_df['r_T'].values.reshape(s,s), sub_df['std'].values.reshape(s,s), cmap='viridis')
         ax.set_title(r'$q = $' + str(q_val))
-        ax.text(-2, 20, "Extirpation")
+        ax.text(-1, 20, "Extirpation")
 
     fig.tight_layout()
     fig.subplots_adjust(left=0.08, bottom=0.15)
     clb = fig.colorbar(CS, ax=axes.ravel().tolist())
     clb.ax.set_ylabel('SD in Pop.', fontsize=12, rotation=270, labelpad=30)
+    axes[0].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
     axes[1].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
     axes[0].set_ylabel(r'$r_T$', fontsize=14, rotation=0, labelpad=20)
     plt.savefig('bifurcation_std.pdf')
@@ -126,14 +127,13 @@ def plot():
         sub_df = df[df['q_vals'] == q_val]
         CS = ax.contourf(sub_df['logbeta'].values.reshape(s,s), sub_df['r_T'].values.reshape(s,s), sub_df['cycle_length'].values.reshape(s,s), cmap='viridis')
         ax.set_title(r'$q = $' + str(q_val))
-        ax.text(-2, 20, "Extirpation")
+        ax.text(-1, 20, "Extirpation")
 
     fig.tight_layout()
     fig.subplots_adjust(left=0.08, bottom=0.15)
     clb = fig.colorbar(CS, ax=axes.ravel().tolist())
     clb.ax.set_ylabel('Cycle Length', fontsize=12, rotation=270, labelpad=30)
     axes[1].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
-    axes[0].set_ylabel(r'$r_T$', fontsize=14, rotation=0, labelpad=20)
     plt.savefig('bifurcation_cycle_length.pdf')
 
 if __name__ == '__main__':
