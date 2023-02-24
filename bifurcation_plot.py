@@ -1,6 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+'''
+This code creates the bifurcation plot in the manuscript. It varies alpha and r_P 
+to determine which of the extirpation global stability conditions pass/fail. 
+'''
+
 def cond_3_alpha(p):
     return 1/p['beta'] * np.log(1 - \
     np.exp(-p['T'] - p['mu'])*(1 + p['u']*p['r_P'] - np.exp(p['T'] + p['mu'] + p['Omega']))*(1 + p['r_S'] - np.exp(p['mu'])) \

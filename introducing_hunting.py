@@ -4,6 +4,12 @@ import wildlife_management_model as wmm
 import matplotlib.pyplot as plt
 import time
 
+'''
+This code generates the figure in the manuscript of introducing winter hunting to lower
+population volitality. The system runs for 100 years with no harvesting, and harvesting is then introduced
+for the next 100 years. 
+'''
+
 model_type = 'wmm'
 
 # Define model parameters. 

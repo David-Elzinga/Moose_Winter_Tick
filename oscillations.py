@@ -10,6 +10,14 @@ from itertools import product
 from scipy.optimize import minimize
 from wildlife_management_model import simulate
 
+'''
+This code generates heatmaps for the population volitality at various
+q, r_P, and beta values. Its parsers specify the number of cores to use, if you 
+are running or plotting the results, and the sample size of the grid. In addition 
+to the volitality heatmaps, it uses a Mulitstart algorithm to calculate the cycle 
+periods, although this bit was excluded from the manuscript for brevity. 
+'''
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-n", "--ncores", type=int, help="number of cores", default=os.cpu_count() - 2)
 parser.add_argument("-m", "--mode", type=str, help="run/plot mode", default="run")
@@ -90,17 +98,16 @@ def main(pool, s):
     df['c'] = [r[3] for r in results]
 
     # Pickle the results.
-    with open('bifurcation_grid.pickle', 'wb') as handle:
+    with open('oscillations_grid.pickle', 'wb') as handle:
         pickle.dump(df, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def plot():
     
     # Open up the data
-    with open('bifurcation_grid.pickle', 'rb') as handle:
+    with open('oscillations_grid.pickle', 'rb') as handle:
         df = pickle.load(handle)
         s = df['logbeta'].unique().shape[0]
 
-    import pdb; pdb.set_trace()
     # Plot the results! 
     fig, axes = plt.subplots(1, 2, figsize=(9,4), sharex=True, sharey=True)
     for ax, q_val in zip(axes, df['q_vals'].unique()):
@@ -116,7 +123,7 @@ def plot():
     axes[0].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
     axes[1].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
     axes[0].set_ylabel(r'$r_T$', fontsize=14, rotation=0, labelpad=20)
-    plt.savefig('bifurcation_std.pdf')
+    plt.savefig('oscillations.pdf')
 
     # Cycle length figure
     df.loc[df['std'] < 100 ,'b'] = np.nan
@@ -134,7 +141,7 @@ def plot():
     clb = fig.colorbar(CS, ax=axes.ravel().tolist())
     clb.ax.set_ylabel('Cycle Length', fontsize=12, rotation=270, labelpad=30)
     axes[1].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
-    plt.savefig('bifurcation_cycle_length.pdf')
+    plt.savefig('cycle_length.pdf')
 
 if __name__ == '__main__':
     args = parser.parse_args()

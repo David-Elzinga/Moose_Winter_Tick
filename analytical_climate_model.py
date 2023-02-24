@@ -1,6 +1,14 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
+'''
+This code serves as a module called "Analytical Climate Model." Its primary purpose is to compute 
+the time series for analytical (more simple, less numeric) model. It requires you to specify the 
+number of years to run, the initial conditions for each of the classes, the parameter set (parm), the number
+of points you want the time series to be computed at in each season (granularity) and the minimum number of moose
+you are willing to accept before an extinction occurs. It also returns the annual mapping solution.
+'''
+
 def annual_map(num_years, init_cond, parm, thresh):
     # Unpack the states
     S, P = init_cond

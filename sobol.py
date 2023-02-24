@@ -11,7 +11,11 @@ import time
 
 import matplotlib.pyplot as plt
 
-# N = 2**14
+'''
+This code runs the Sobol Sensitivity Analysis for the WMM. It uses parsers for 
+the number of samples (2^14), the number of cores to use, and if 
+you should be generating or analyzing the results (which includes plotting)
+'''
 
 default_n = os.cpu_count()
 parser = argparse.ArgumentParser()
@@ -22,6 +26,7 @@ parser.add_argument("-n", "--ncores", type=int, default = default_n,
 parser.add_argument("-m", "--mode", type=str, default = 'generate',
                     help="generate or analyze sobol samples")
 
+# Each worker just runs the model with their parameter values 
 def worker(param_values):
     output = run_model(param_values)
     return output
@@ -47,6 +52,7 @@ def run_model(p):
     tsol, Zsol, Zwinter = simulate(num_years, init_cond=[S0, E0, P0, H0, Q0], p=parm, granularity=2, thresh=10)
     t1 = time.time()
 
+    # If this parameter set takes a long time, print out the parameters
     if t1 - t0 > 30:
         print(parm)
 
@@ -128,9 +134,11 @@ def analyze_sobol():
         ]
     }
 
+    # Load the results
     with open('unprocessed_sobol.pickle', 'rb') as handle:
         result = pickle.load(handle)
     
+    # Calculate Sobol indices
     output = np.array(result['output_std'])
     S2 = {}
     var_sens = sobol.analyze(problem, output, calc_second_order=True)
@@ -139,7 +147,7 @@ def analyze_sobol():
     S2['var_conf'] = pd.DataFrame(var_sens.pop('S2_conf'), index=problem['names'],
                            columns=problem['names'])
     var_sens_std = pd.DataFrame(var_sens,index=problem['names'])
-    var_sens_std = var_sens_std[var_sens_std['ST'] > 0]
+    var_sens_std = var_sens_std[var_sens_std['ST'] > 0] 
 
     output = np.array(result['output_pop_size'])
     S2 = {}
@@ -152,6 +160,7 @@ def analyze_sobol():
     var_sens_pop_size = var_sens_pop_size[var_sens_pop_size['ST'] > 0]
 
 
+    # Make the plot! 
     ind = np.arange(len(var_sens_std.index))  # the x locations for the groups
     width = 0.35  # the width of the bars
 
