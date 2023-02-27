@@ -5,4 +5,5 @@ along with a few additional files. Each file in the repository in the repository
 
 - ``analytical_climate_model.py`` - Python module to simulate the analytical climate model 
 - ``analytical_climate_model_proofs.nb`` - Mathematica Notebook with computations that are referenced in proofs of the manuscript
-- 
+- ``bifurcation_plot.py`` - Python script that generates the bifurcation figure, ``bif_plot.pdf``
+- ``hunting_control.py`` - Python script that generates the harvesting heatmap figure, ``hunting_cycles.pdf``
