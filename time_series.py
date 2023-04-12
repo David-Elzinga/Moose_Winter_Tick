@@ -15,10 +15,10 @@ model_type = 'wmm'
 # Define model parameters. 
 parm = {}
 parm['omega'] = 0.5425; parm['alpha'] = 0.0833; parm['tau'] = 1 - parm['alpha'] - parm['omega']
-parm['mu'] = 0.2835; parm['nu'] = 2.3772;  parm['gamma'] = 1.8523; parm['beta'] = 10**(-3)
-parm['r_S'] = 0.8590; parm['r_P'] = 0.4998; parm['u'] = 0.75
+parm['mu'] = 0.2835; parm['nu'] = 2.3772;  parm['gamma'] = 1.8523; parm['beta'] = 10**(-2.2)
+parm['r_S'] = 0.8590; parm['r_P'] = 0.4998; parm['u'] = 0.75; parm['epsilon'] = 10**(-2)
 
-parm['eta'] = 1.1886; parm['xi'] = 52000; parm['q'] = 0.75; parm['K'] = 1500; parm['r_T'] = 13.0293
+parm['eta'] = 1.1886; parm['xi'] = 49200; parm['q'] = 0.75; parm['K'] = 1500; parm['r_T'] = 13.0293
 parm['c'] = 10**(-2); parm['beta_T'] = parm['beta']/1; parm['beta_M'] = parm['beta']/parm['xi']
 
 parm['mu_alpha'] = 0; parm['mu_omega'] = 0

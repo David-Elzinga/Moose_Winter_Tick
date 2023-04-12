@@ -66,7 +66,7 @@ def main(pool):
     ax[1].set_xlabel(r'$\mu_\omega$', fontsize=20); ax[1].set_ylabel(r'$\mu_\alpha$', fontsize=20)
     cbar = fig.colorbar(CS, ax = ax[1])
 
-    plt.savefig('hunting_cycles.pdf', bbox_inches='tight')
+    plt.savefig('hunting_heatmap.pdf', bbox_inches='tight')
     plt.show()
 
 

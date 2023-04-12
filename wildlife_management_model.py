@@ -53,7 +53,7 @@ def simulate(num_years, init_cond, p, granularity, thresh):
         dS = -p['beta_M']*S*Q - (p['mu'] + p['mu_alpha'])*S
         dE = -p['beta_M']*E*Q - (p['mu'] + p['mu_alpha'])*E
         dP = p['beta_M']*(S + E)*Q - (p['mu'] + p['mu_alpha'])*P
-        dH = p['beta_T']*N*Q
+        dH = p['beta_T']*N*Q - (p['mu'] + p['mu_alpha'])*H
         dQ = -p['beta_T']*N*Q
         return [dS, dE, dP, dH, dQ]
     
@@ -80,7 +80,7 @@ def simulate(num_years, init_cond, p, granularity, thresh):
         new_E = E + P + p['u']*p['r_P']*(E + P)*(1 - N/p['K'])
         new_P = 0
         new_H = 0
-        new_Q = H
+        new_Q = Q + H
         Zsol = np.vstack((Zsol, np.array([new_S, new_E, new_P, new_H, new_Q])))
 
         # Simulate summer. 
@@ -114,7 +114,7 @@ def simulate(num_years, init_cond, p, granularity, thresh):
         new_E = E
         new_P = P
         new_H = H
-        new_Q = 0
+        new_Q = p['epsilon']*Q
         Zsol = np.vstack((Zsol, np.array([new_S, new_E, new_P, new_H, new_Q])))
 
     return tsol, Zsol, Zwinter

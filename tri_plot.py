@@ -28,7 +28,7 @@ def cond_3(p):
 p = {}
 p['omega'] = 0.5425; p['alpha'] = 0.0833; p['tau'] = 1 - p['alpha'] - p['omega']
 p['mu'] = 0.2835; p['nu'] = 2.3772;  p['gamma'] = 1.8523; p['beta'] = 2.5595
-p['r_S'] = 0.8590; p['r_P'] = 0.4998; p['u'] = 0.75
+p['r_S'] = 0.8287; p['r_P'] = 0.4998; p['u'] = 0.75
 
 # Make the figure 
 fig = plt.figure(figsize=(14.8, 4.8))
@@ -70,17 +70,17 @@ for k, p['beta'] in enumerate([0.8*2.5595, 2.5595, 1.2*2.5595]):
     
     ax.scatter(0.0833, 0.5425, 0.3742, color='orange', marker='o', s=60)
 
-    ax.set_tlabel(r'$\alpha$', fontsize=15)
-    ax.set_llabel(r'$\omega$', fontsize=15)
-    ax.set_rlabel(r'$\tau$', fontsize=15)
+    ax.set_tlabel(r'Autumn, $\alpha$', fontsize=15, rotation=45)
+    ax.set_llabel(r'Winter, $\omega$', fontsize=15)
+    ax.set_rlabel(r'Summer ($\tau$)', fontsize=15)
 
-    ax.taxis.set_label_rotation_mode('horizontal')
-    ax.laxis.set_label_rotation_mode('horizontal')
-    ax.raxis.set_label_rotation_mode('horizontal')
+    ax.taxis.set_label_rotation_mode('axis')
+    ax.laxis.set_label_rotation_mode('axis')
+    ax.raxis.set_label_rotation_mode('axis')
 
     ax.set_title(r'$\beta = $' + str(round(p['beta'], 4)), y=0, pad=-35, verticalalignment="top", fontsize=15)
 
 # Save the plot!
-plt.subplots_adjust(wspace=0.6)
+plt.subplots_adjust(wspace=0.8)
 fig.savefig('tri_plot.pdf', bbox_inches='tight')
 plt.show()

@@ -15,7 +15,7 @@ def cond_3_alpha(p):
 p = {}
 p['omega'] = 0.5425; p['alpha'] = 0.0833; p['tau'] = 1 - p['alpha'] - p['omega']
 p['mu'] = 0.2835; p['nu'] = 2.3772;  p['gamma'] = 1.8523; p['beta'] = 2.5595
-p['r_S'] = 0.8590; p['r_P'] = 0.4998; p['u'] = 0.75
+p['r_S'] = 0.8287; p['r_P'] = 0.4998; p['u'] = 0.75
 
 # Define parameter groupings
 p['T'] = p['tau']*p['gamma'];
@@ -68,12 +68,13 @@ ax.vlines(x = rP_max, ymin = 0, ymax = 1, linestyle='--', color='k')
 
 ax.set_xlim(0, rP_max  + 0.5)
 ax.set_ylim(0, 1.1)
-ax.set_xlabel(r'$r_P$', fontsize=15)
-ax.set_ylabel(r'$\alpha$', rotation=0, fontsize=15, labelpad=20)
+ax.set_xlabel(r'Reproduction Rate of Parasitized Moose, $r_P$ (Moose)', fontsize=15, labelpad=10)
+ax.set_ylabel(r'Annual Autumn Proportion, $\alpha$ ', rotation=90, fontsize=15, labelpad=10)
 
 ax.text(x=1.25, y=0.55, s="Extirpation", size=15)
 ax.text(x=2.5, y=0.05, s="Persistence", size=15)
 ax.text(x=4.05, y=0.35, s="Persistence", rotation=90, size=15)
 
-fig.savefig('bif_plot.pdf')
+plt.subplots_adjust(bottom=0.2)
+fig.savefig('bif_plot.pdf', bbox_inches='tight')
 plt.show()
