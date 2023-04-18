@@ -21,7 +21,7 @@ periods, although this bit was excluded from the manuscript for brevity.
 parser = argparse.ArgumentParser()
 parser.add_argument("-n", "--ncores", type=int, help="number of cores", default=os.cpu_count() - 2)
 parser.add_argument("-m", "--mode", type=str, help="run/plot mode", default="run")
-parser.add_argument("-s", "--samplesize", type=int, help="sample sizes per parameter", default=20)
+parser.add_argument("-s", "--samplesize", type=int, help="sample sizes per parameter", default=200)
 
 def worker(param_values):
 
@@ -37,7 +37,7 @@ def worker(param_values):
     parm['r_S'] = 0.8590; parm['r_P'] = 0.4998; parm['u'] = 0.75
 
     parm['eta'] = 1.1886; parm['xi'] = 52000; parm['K'] = 1500
-    parm['c'] = 10**(-2); parm['beta_T'] = parm['beta']/1; parm['beta_M'] = parm['beta']/parm['xi']
+    parm['c'] = 10**(-2); parm['beta_T'] = parm['beta']/1; parm['beta_M'] = parm['beta']/parm['xi']; parm['epsilon'] = 0.01
 
     parm['mu_alpha'] = 0; parm['mu_omega'] = 0
 
@@ -47,38 +47,9 @@ def worker(param_values):
     tsol, Zsol, Zwinter = simulate(num_years, init_cond=[S0, E0, P0, H0, Q0], p=parm, granularity=2, thresh=10)
 
     if len(Zwinter) < num_years: # In this case there was an extinction
-        return (np.nan, np.nan, np.nan, np.nan) # std dev, a, b, c (fits)
+        return (np.nan, len(Zwinter)) # std dev, ext time
     else: # Not an extinction, record an estimate of the parameters to fit the cycles
-        
-        def func(x_data, a, b, c):
-            return a*np.cos(b*x_data) + c # general cosine function
-
-        def cost(x):
-            a = x[0]; b = x[1]; c = x[2]
-            return sum((y_data - func(x_data, a, b, c))**2) # sum of squared residuals between this cosine and the real data
-
-        # Define various initial conditions for the cosine to avoid getting trapped in local minima
-        a_guesses = np.linspace(0, 1500, 5)
-        b_guesses = np.linspace(np.pi/50, np.pi, 5)
-        c_guesses = np.linspace(0, 1000, 5)
-
-        x_data = np.linspace(0, 100, 100)
-        y_data = Zwinter[-100:]
-
-        guesses = list(product(a_guesses, b_guesses, c_guesses))
-        cost_of_guesses = []
-        fits = []
-        
-        # For each initial condition, search for the minimum value witin certain bounds
-        for guess in guesses:
-            fit = minimize(cost, guess, method='Nelder-Mead', bounds=((None, None), (0, np.pi), (None, None)), tol=1e-6)
-            fits.append(fit)
-            cost_of_guesses.append(fit.fun)
-
-        # Consider the lowest cost fit to be the global minimum
-        best_fit_indx = cost_of_guesses.index(min(cost_of_guesses))
-        popt = fits[best_fit_indx].x
-        return (np.std(Zwinter[-100:]), popt[0], popt[1], popt[2])
+        return (np.std(Zwinter[-100:]), np.nan)
 
 def main(pool, s):
 
@@ -93,9 +64,7 @@ def main(pool, s):
     # In parallel, run the model with each parameter combination, record the std dev. in population. 
     results = pool.map(worker, df.values)
     df['std'] = [r[0] for r in results]
-    df['a'] = [r[1] for r in results]
-    df['b'] = [r[2] for r in results]
-    df['c'] = [r[3] for r in results]
+    df['ext_time'] = [r[1] for r in results]
 
     # Pickle the results.
     with open('oscillations_grid.pickle', 'wb') as handle:

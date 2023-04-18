@@ -161,7 +161,6 @@ def analyze_sobol():
     var_sens_pop_size = pd.DataFrame(var_sens,index=problem['names'])
     var_sens_pop_size = var_sens_pop_size[var_sens_pop_size['ST'] > 0]
 
-
     # Make the plot! 
     ind = np.arange(len(var_sens_std.index))  # the x locations for the groups
     width = 0.35  # the width of the bars
@@ -171,10 +170,10 @@ def analyze_sobol():
                     label='Pop. SD.')
     rects2 = ax.bar(ind + width/2, var_sens_pop_size['ST'], width, yerr=var_sens_pop_size['ST_conf'],
                     label='Pop. Size')
-    
+
     ax.set_ylabel('Total Sobol Index', fontsize=15)
     ax.set_xticks(ind)
-    ax.set_xticklabels((r'$\omega$', r'$\alpha$', r'$\mu$', r'$\nu$', r'$\beta$', r'$r_S$', r'$r_P$', r'$u$', r'$\eta$', r'$\xi$', r'$q$', r'$K$', r'$r_T$'))
+    ax.set_xticklabels((r'$\omega$', r'$\alpha$', r'$\mu$', r'$\nu$', r'$\beta$', r'$r_S$', r'$r_P$', r'$u$', r'$\eta$', r'$\xi$', r'$q$', r'$K$', r'$r_T$', r'$\varepsilon$'))
     ax.legend(fontsize=12)
     ax.set_ylim(0, 1)
 
