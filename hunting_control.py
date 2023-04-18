@@ -24,7 +24,7 @@ def worker(obj):
     parm['r_S'] = 0.8590; parm['r_P'] = 0.4998; parm['u'] = 0.75
 
     parm['eta'] = 1.1886; parm['xi'] = 52000; parm['q'] = 0.75; parm['K'] = 1500; parm['r_T'] = 13.0293
-    parm['c'] = 10**(-2); parm['beta_T'] = parm['beta']/1; parm['beta_M'] = parm['beta']/parm['xi']
+    parm['c'] = 10**(-2); parm['beta_T'] = parm['beta']/1; parm['beta_M'] = parm['beta']/parm['xi']; parm['epsilon'] = 0.01
 
     # Unpack the hunting params.
     print(obj)
@@ -42,7 +42,7 @@ def worker(obj):
 def main(pool):
 
     # Construct a grid of values for the hunting rates. 
-    s = 100
+    s = 500
     mu_omega_vals =  np.linspace(0, 1, s)
     mu_alpha_vals = np.linspace(0, 1, s)
 
@@ -58,12 +58,12 @@ def main(pool):
     fig, ax = plt.subplots(1, 2, figsize=(9,4), sharex=True, sharey=True)
     CS = ax[0].contourf(df['mu_omega'].values.reshape(s,s), df['mu_alpha'].values.reshape(s,s), df['min_pop'].values.reshape(s,s), cmap='viridis')
     ax[0].set_title('Minimum Herd Population')
-    ax[0].set_xlabel(r'$\mu_\omega$', fontsize=20); ax[0].set_ylabel(r'$\mu_\alpha$', fontsize=20)
+    ax[0].set_xlabel('Winter Harvesting Rate ' + r'$\mu_\omega$', fontsize=15); ax[0].set_ylabel('Autumn Harvesting Rate ' + r'$\mu_\alpha$', fontsize=15)
     cbar = fig.colorbar(CS, ax = ax[0])
 
     CS = ax[1].contourf(df['mu_omega'].values.reshape(s,s), df['mu_alpha'].values.reshape(s,s), df['max_pop'].values.reshape(s,s), cmap='viridis')
     ax[1].set_title('Maximum Herd Population')
-    ax[1].set_xlabel(r'$\mu_\omega$', fontsize=20); ax[1].set_ylabel(r'$\mu_\alpha$', fontsize=20)
+    ax[1].set_xlabel('Winter Harvesting Rate ' + r'$\mu_\omega$', fontsize=15); ax[1].set_ylabel('Autumn Harvesting Rate ' + r'$\mu_\alpha$', fontsize=15)
     cbar = fig.colorbar(CS, ax = ax[1])
 
     plt.savefig('hunting_heatmap.pdf', bbox_inches='tight')

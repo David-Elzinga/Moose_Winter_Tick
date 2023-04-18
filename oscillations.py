@@ -81,36 +81,24 @@ def plot():
     fig, axes = plt.subplots(1, 2, figsize=(9,4), sharex=True, sharey=True)
     for ax, q_val in zip(axes, df['q_vals'].unique()):
         sub_df = df[df['q_vals'] == q_val]
-        CS = ax.contourf(sub_df['logbeta'].values.reshape(s,s), sub_df['r_T'].values.reshape(s,s), sub_df['std'].values.reshape(s,s), cmap='viridis')
+        CS_sd = ax.contourf(sub_df['logbeta'].values.reshape(s,s), sub_df['r_T'].values.reshape(s,s), sub_df['std'].values.reshape(s,s), cmap='cool')
+        CS_ext_time = ax.contourf(sub_df['logbeta'].values.reshape(s,s), sub_df['r_T'].values.reshape(s,s), sub_df['ext_time'].values.reshape(s,s), cmap='autumn')
         ax.set_title(r'$q = $' + str(q_val))
         ax.text(-1, 20, "Extirpation")
 
     fig.tight_layout()
     fig.subplots_adjust(left=0.08, bottom=0.15)
-    clb = fig.colorbar(CS, ax=axes.ravel().tolist())
-    clb.ax.set_ylabel('SD in Pop.', fontsize=12, rotation=270, labelpad=30)
+
+    clb_ext_time = fig.colorbar(CS_ext_time, ax=axes.ravel().tolist())
+    clb_ext_time.ax.set_ylabel('Extirpation Year', fontsize=12, rotation=270, labelpad=20)
+
+    clb_sd = fig.colorbar(CS_sd, ax=axes.ravel().tolist())
+    clb_sd.ax.set_ylabel('SD in Pop.', fontsize=12, rotation=270, labelpad=20)
+
     axes[0].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
     axes[1].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
     axes[0].set_ylabel(r'$r_T$', fontsize=14, rotation=0, labelpad=20)
     plt.savefig('oscillations.pdf')
-
-    # Cycle length figure
-    df.loc[df['std'] < 100 ,'b'] = np.nan
-    df['cycle_length'] = 2*np.pi / np.abs(df['b'])
-    df.loc[df['cycle_length'] > 100, 'cycle_length'] = np.nan
-    fig, axes = plt.subplots(1, 2, figsize=(9,4), sharex=True, sharey=True)
-    for ax, q_val in zip(axes, df['q_vals'].unique()):
-        sub_df = df[df['q_vals'] == q_val]
-        CS = ax.contourf(sub_df['logbeta'].values.reshape(s,s), sub_df['r_T'].values.reshape(s,s), sub_df['cycle_length'].values.reshape(s,s), cmap='viridis')
-        ax.set_title(r'$q = $' + str(q_val))
-        ax.text(-1, 20, "Extirpation")
-
-    fig.tight_layout()
-    fig.subplots_adjust(left=0.08, bottom=0.15)
-    clb = fig.colorbar(CS, ax=axes.ravel().tolist())
-    clb.ax.set_ylabel('Cycle Length', fontsize=12, rotation=270, labelpad=30)
-    axes[1].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
-    plt.savefig('cycle_length.pdf')
 
 if __name__ == '__main__':
     args = parser.parse_args()
