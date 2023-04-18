@@ -43,7 +43,7 @@ def run_model(p):
     parm['r_S'] = p[6]; parm['r_P'] = p[7]; parm['u'] = p[8]
 
     parm['eta'] = p[9]; parm['xi'] = p[10]; parm['q'] = p[11]; parm['K'] = p[12]; parm['r_T'] = p[13]
-    parm['c'] = 10**(-p[14]); parm['beta_T'] = parm['beta']/1; parm['beta_M'] = parm['beta']/parm['xi']
+    parm['c'] = 10**(p[14]); parm['epsilon'] = 10**(p[15]); parm['beta_T'] = parm['beta']/1; parm['beta_M'] = parm['beta']/parm['xi']
 
     # Run the model
     num_years = 200
@@ -67,9 +67,9 @@ def main(N, ncores=None, pool=None):
     # Define the parameter space within the context of a problem dictionary
     problem = {
         # number of parameters
-        'num_vars' : 16,
+        'num_vars' : 17,
         # parameter names
-        'names' : ['omega', 'alpha', 'mu', 'nu', 'gamma', 'beta', 'r_S', 'r_P', 'u', 'eta', 'xi', 'q', 'K', 'r_T', 'c', 'dummy'], 
+        'names' : ['omega', 'alpha', 'mu', 'nu', 'gamma', 'beta', 'r_S', 'r_P', 'u', 'eta', 'xi', 'q', 'K', 'r_T', 'c', 'epsilon', 'dummy'], 
         # bounds for each corresponding parameter
         'bounds' : [
         [0.5014, 0.5836], # omega
@@ -87,6 +87,7 @@ def main(N, ncores=None, pool=None):
         [1200, 1800], # K
         [3.2588, 35.5531], # r_T
         [-4, 0], # c (log-scale)
+        [-5, -1], # epsilon (log-scale)
         [-1, 1] # dummy
         ]
     }
@@ -110,9 +111,9 @@ def analyze_sobol():
     # Define the parameter space within the context of a problem dictionary
     problem = {
         # number of parameters
-        'num_vars' : 16,
+        'num_vars' : 17,
         # parameter names
-        'names' : ['omega', 'alpha', 'mu', 'nu', 'gamma', 'beta', 'r_S', 'r_P', 'u', 'eta', 'xi', 'q', 'K', 'r_T', 'c', 'dummy'], 
+        'names' : ['omega', 'alpha', 'mu', 'nu', 'gamma', 'beta', 'r_S', 'r_P', 'u', 'eta', 'xi', 'q', 'K', 'r_T', 'c', 'epsilon', 'dummy'], 
         # bounds for each corresponding parameter
         'bounds' : [
         [0.5014, 0.5836], # omega
@@ -130,6 +131,7 @@ def analyze_sobol():
         [1200, 1800], # K
         [3.2588, 35.5531], # r_T
         [-4, 0], # c (log-scale)
+        [-5, -1], # epsilon (log-scale)
         [-1, 1] # dummy
         ]
     }
