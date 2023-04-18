@@ -50,6 +50,7 @@ cond_1_rP = (np.exp(p['T'] + p['mu'] + p['Omega']) - 1)/p['u']
 cond_3_rP = np.exp(p['Omega'] + p['mu']) - 1
 
 # Calculate the largest value of rP such that both conditions pass (e.g. the min of the two)
+import pdb; pdb.set_trace()
 rP_max = min(cond_1_rP, cond_3_rP)
 
 # Determine the critical value of alpha. If alpha is less than this value, 
