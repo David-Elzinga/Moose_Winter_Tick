@@ -20,7 +20,7 @@ def worker(obj):
     # Define model parameters. 
     parm = {}
     parm['omega'] = 0.5425; parm['alpha'] = 0.0833; parm['tau'] = 1 - parm['alpha'] - parm['omega']
-    parm['mu'] = 0.2835; parm['nu'] = 2.3772;  parm['gamma'] = 1.8523; parm['beta'] = 10**(-2)
+    parm['mu'] = 0.2835; parm['nu'] = 2.3772;  parm['gamma'] = 1.8523; parm['beta'] = 10**(-2.1)
     parm['r_S'] = 0.8590; parm['r_P'] = 0.4998; parm['u'] = 0.75
 
     parm['eta'] = 1.1886; parm['xi'] = 52000; parm['q'] = 0.75; parm['K'] = 1500; parm['r_T'] = 13.0293
