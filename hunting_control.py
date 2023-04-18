@@ -42,7 +42,7 @@ def worker(obj):
 def main(pool):
 
     # Construct a grid of values for the hunting rates. 
-    s = 15
+    s = 500
     mu_omega_vals =  np.linspace(0, 1, s)
     mu_alpha_vals = np.linspace(0, 1, s)
 
