@@ -42,7 +42,7 @@ def worker(obj):
 def main(pool):
 
     # Construct a grid of values for the hunting rates. 
-    s = 500
+    s = 20
     mu_omega_vals =  np.linspace(0, 1, s)
     mu_alpha_vals = np.linspace(0, 1, s)
 
@@ -58,12 +58,12 @@ def main(pool):
     fig, ax = plt.subplots(1, 2, figsize=(9,4), sharex=True, sharey=True)
     CS = ax[0].contourf(df['mu_omega'].values.reshape(s,s), df['mu_alpha'].values.reshape(s,s), df['min_pop'].values.reshape(s,s), cmap='viridis')
     ax[0].set_title('Minimum Herd Population')
-    ax[0].set_xlabel('Winter Harvesting Rate ' + r'$\mu_\omega$', fontsize=15); ax[0].set_ylabel('Autumn Harvesting Rate ' + r'$\mu_\alpha$' + ' (moose/year)', fontsize=15)
+    ax[0].set_xlabel('Winter Harvesting Rate ' + r'$\mu_\omega$' + ' (moose/year)', fontsize=11); ax[0].set_ylabel('Autumn Harvesting Rate ' + r'$\mu_\alpha$' + ' (moose/year)', fontsize=11)
     cbar = fig.colorbar(CS, ax = ax[0])
 
     CS = ax[1].contourf(df['mu_omega'].values.reshape(s,s), df['mu_alpha'].values.reshape(s,s), df['max_pop'].values.reshape(s,s), cmap='viridis')
     ax[1].set_title('Maximum Herd Population')
-    ax[1].set_xlabel('Winter Harvesting Rate ' + r'$\mu_\omega$', fontsize=15); ax[1].set_ylabel('Autumn Harvesting Rate ' + r'$\mu_\alpha$' + ' (moose/year)', fontsize=15)
+    ax[1].set_xlabel('Winter Harvesting Rate ' + r'$\mu_\omega$' + ' (moose/year)', fontsize=11); ax[1].set_ylabel('Autumn Harvesting Rate ' + r'$\mu_\alpha$' + ' (moose/year)', fontsize=11)
     cbar = fig.colorbar(CS, ax = ax[1])
 
     plt.savefig('hunting_heatmap.pdf', bbox_inches='tight')
