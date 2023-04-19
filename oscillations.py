@@ -95,9 +95,9 @@ def plot():
     clb_sd = fig.colorbar(CS_sd, ax=axes.ravel().tolist())
     clb_sd.ax.set_ylabel('SD in Pop.', fontsize=12, rotation=270, labelpad=20)
 
-    axes[0].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
-    axes[1].set_xlabel(r'$\log_{10}(\beta)$', fontsize=14, labelpad=10)
-    axes[0].set_ylabel(r'$r_T$', fontsize=14, rotation=0, labelpad=20)
+    axes[0].set_xlabel(r'Log Rate of Parasitism, $\log_{10}(\beta)$', fontsize=11, labelpad=10)
+    axes[1].set_xlabel(r'Log Rate of Parasitism, $\log_{10}(\beta)$', fontsize=11, labelpad=10)
+    axes[0].set_ylabel(r'Average Tick Reproduction, $r_T$', fontsize=11, rotation=90, labelpad=10)
     plt.savefig('oscillations.pdf')
 
 if __name__ == '__main__':

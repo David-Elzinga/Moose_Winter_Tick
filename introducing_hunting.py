@@ -58,6 +58,6 @@ axes[1].set_ylabel('Log Tick Population', fontsize=18)
 axes[0].axvline(100, linestyle=':', color='k')
 axes[1].axvline(100, linestyle=':', color='k')
 
-plt.subplots_adjust(hspace=0.2)
+plt.subplots_adjust(hspace=0.1)
 plt.savefig('introducing_hunting.pdf')
 plt.show()
